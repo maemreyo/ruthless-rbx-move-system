@@ -1,0 +1,1263 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="LocalScript" referent="RBX4c8f9e65c39b487581851a59cff57cb0">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+			<bool name="DefinesCapabilities">false</bool>
+			<bool name="Disabled">false</bool>
+			<Content name="LinkedSource"><null></null></Content>
+			<string name="Name">WindController</string>
+			<token name="RunContext">0</token>
+			<string name="ScriptGuid">{BE9516C5-F9C0-4B6B-AA3B-B711D91C4AF2}</string>
+			<ProtectedString name="Source"><![CDATA[local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+
+local WIND_DIRECTION = Vector3.new(1,0,0.3)
+local WIND_SPEED = 20
+local WIND_POWER = 0.5
+
+
+local WindLines = require(script.WindLines)
+local WindShake = require(script.WindShake)
+
+WindLines:Init({
+	Direction = WIND_DIRECTION;
+	Speed = WIND_SPEED;
+	Lifetime = 2;
+	SpawnRate = 15;
+})
+
+
+WindShake:SetDefaultSettings({
+	WindSpeed = WIND_SPEED;
+	WindDirection = WIND_DIRECTION;
+	WindPower = WIND_POWER;
+})
+WindShake:Init()
+
+-- Demo dynamic settings
+
+local Gui = Instance.new("ScreenGui")
+
+
+local CountLabel = Instance.new("TextLabel")
+CountLabel.Text = string.format("Leaf Count: %d Active, %d Inactive, 77760 Total",0,0)
+CountLabel.BackgroundTransparency = 0.3
+CountLabel.BackgroundColor3 = Color3.new()
+CountLabel.TextStrokeTransparency = 0.8
+CountLabel.Size = UDim2.new(0.6,0,0,27)
+CountLabel.Position = UDim2.new(0.2,0,1,-35)
+CountLabel.Font = Enum.Font.RobotoMono
+CountLabel.TextSize = 25
+CountLabel.TextColor3 = Color3.new(1,1,1)
+CountLabel.Parent = Gui
+
+local SpeedInput = Instance.new("TextBox")
+SpeedInput.Text = string.format("Wind Speed: %.1f",WIND_SPEED)
+SpeedInput.PlaceholderText = "Input Speed"
+SpeedInput.BackgroundTransparency = 0.8
+SpeedInput.TextStrokeTransparency = 0.8
+SpeedInput.Size = UDim2.new(0.2,0,0,20)
+SpeedInput.Position = UDim2.new(0,5,0.45,0)
+SpeedInput.Font = Enum.Font.RobotoMono
+SpeedInput.TextXAlignment = Enum.TextXAlignment.Left
+SpeedInput.TextSize = 18
+SpeedInput.TextColor3 = Color3.new(1,1,1)
+SpeedInput.FocusLost:Connect(function()
+	local newSpeed = tonumber(SpeedInput.Text:match("[%d%.]+"))
+	if newSpeed then
+		WIND_SPEED = math.clamp(newSpeed,0,50)
+		WindLines.Speed = WIND_SPEED
+		WindShake:UpdateAllObjectSettings({Speed = WIND_SPEED})
+		WindShake:SetDefaultSettings({Speed = WIND_SPEED})
+	end
+	SpeedInput.Text = string.format("Wind Speed: %.1f",WIND_SPEED)
+end)
+SpeedInput.Parent = Gui
+
+local PowerInput = Instance.new("TextBox")
+PowerInput.Text = string.format("Wind Power: %.1f",WIND_POWER)
+PowerInput.PlaceholderText = "Input Power"
+PowerInput.BackgroundTransparency = 0.8
+PowerInput.TextStrokeTransparency = 0.8
+PowerInput.Size = UDim2.new(0.2,0,0,20)
+PowerInput.Position = UDim2.new(0,5,0.45,25)
+PowerInput.Font = Enum.Font.RobotoMono
+PowerInput.TextXAlignment = Enum.TextXAlignment.Left
+PowerInput.TextSize = 18
+PowerInput.TextColor3 = Color3.new(1,1,1)
+PowerInput.FocusLost:Connect(function()
+	local newPower = tonumber(PowerInput.Text:match("[%d%.]+"))
+	if newPower then
+		WIND_POWER = math.clamp(newPower,0,3)
+		WindShake:UpdateAllObjectSettings({Power = WIND_POWER})
+		WindShake:SetDefaultSettings({Power = WIND_POWER})
+	end
+	PowerInput.Text = string.format("Wind Power: %.1f",WIND_POWER)
+end)
+PowerInput.Parent = Gui
+
+local DirInput = Instance.new("TextBox")
+DirInput.Text = string.format("Wind Direction: %.1f,%.1f,%.1f",WIND_DIRECTION.X,WIND_DIRECTION.Y,WIND_DIRECTION.Z)
+DirInput.PlaceholderText = "Input Direction"
+DirInput.BackgroundTransparency = 0.8
+DirInput.TextStrokeTransparency = 0.8
+DirInput.Size = UDim2.new(0.2,0,0,20)
+DirInput.Position = UDim2.new(0,5,0.45,50)
+DirInput.Font = Enum.Font.RobotoMono
+DirInput.TextXAlignment = Enum.TextXAlignment.Left
+DirInput.TextSize = 18
+DirInput.TextColor3 = Color3.new(1,1,1)
+DirInput.FocusLost:Connect(function()
+
+	local Inputs = table.create(3)
+	for Num in string.gmatch(DirInput.Text, "%-?[%d%.]+") do
+		Inputs[#Inputs+1] = tonumber(Num)
+	end
+
+	local newDir = Vector3.new(
+		Inputs[1] or WIND_DIRECTION.X,
+		Inputs[2] or WIND_DIRECTION.Y,
+		Inputs[3] or WIND_DIRECTION.Z
+	).Unit
+	if newDir then
+		WIND_DIRECTION = newDir
+		WindLines.Direction = newDir
+		WindShake:UpdateAllObjectSettings({Direction = newDir})
+		WindShake:SetDefaultSettings({Direction = newDir})
+	end
+
+	DirInput.Text = string.format("Wind Direction: %.1f, %.1f, %.1f",WIND_DIRECTION.X,WIND_DIRECTION.Y,WIND_DIRECTION.Z)
+end)
+DirInput.Parent = Gui
+
+
+
+spawn(function()
+	while wait(0.1) do
+		local Active,Handled = WindShake.Active,WindShake.Handled
+		CountLabel.Text = string.format("Leaf Count: %d Active, %d Inactive, %d Not Streamed In (77760 Total)",Active,Handled-Active,77760-Handled)
+	end
+end)]]></ProtectedString>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="ModuleScript" referent="RBXc35e1de172704d17bcaa218a46135c49">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">WindLines</string>
+				<string name="ScriptGuid">{3008A27D-871E-4579-BEDB-AD10895CA4E0}</string>
+				<ProtectedString name="Source"><![CDATA[local RunService = game:GetService("RunService")
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+
+local EMPTY_TABLE = {}
+local OFFSET = Vector3.new(0,0.1,0)
+
+local module = {}
+
+module.UpdateQueue = table.create(10)
+
+function module:Init(Settings)
+	-- Set defaults
+	module.Lifetime = Settings.Lifetime or 3
+	module.Direction = Settings.Direction or Vector3.new(1,0,0)
+	module.Speed = Settings.Speed or 6
+	
+	-- Clear any old stuff
+	if module.UpdateConnection then
+		module.UpdateConnection:Disconnect()
+		module.UpdateConnection = nil
+	end
+	
+	for _, WindLine in ipairs(module.UpdateQueue) do
+		WindLine.Attachment0:Destroy()
+		WindLine.Attachment1:Destroy()
+		WindLine.Trail:Destroy()
+	end
+	table.clear(module.UpdateQueue)
+	
+	module.LastSpawned = os.clock()
+	local SpawnRate = 1/(Settings.SpawnRate or 25)
+	
+	-- Setup logic loop
+	module.UpdateConnection = RunService.Heartbeat:Connect(function()
+		local Clock = os.clock()
+		
+		-- Spawn handler
+		if Clock-module.LastSpawned > SpawnRate then
+			module:Create()
+			module.LastSpawned = Clock
+		end
+		
+		-- Update queue handler
+		debug.profilebegin("Wind Lines")
+		for i, WindLine in ipairs(module.UpdateQueue) do
+			
+			local AliveTime = Clock-WindLine.StartClock
+			if AliveTime >= WindLine.Lifetime then
+				-- Destroy the objects
+				WindLine.Attachment0:Destroy()
+				WindLine.Attachment1:Destroy()
+				WindLine.Trail:Destroy()
+				
+				-- unordered remove at this index
+				local Length = #module.UpdateQueue
+				module.UpdateQueue[i] = module.UpdateQueue[Length]
+				module.UpdateQueue[Length] = nil
+				
+				continue
+			end
+			
+			WindLine.Trail.MaxLength = 20 - (20*(AliveTime/WindLine.Lifetime))
+			
+			local SeededClock = (Clock+WindLine.Seed)*(WindLine.Speed*0.2)
+			local StartPos = WindLine.Position
+			WindLine.Attachment0.WorldPosition = (
+				CFrame.new(StartPos, StartPos+WindLine.Direction) * CFrame.new(0,0,WindLine.Speed * -AliveTime)
+			).Position + Vector3.new(math.sin(SeededClock)*0.5,math.sin(SeededClock)*0.8,math.sin(SeededClock)*0.5)
+			
+			WindLine.Attachment1.WorldPosition = WindLine.Attachment0.WorldPosition + OFFSET
+			
+		end
+		debug.profileend()
+	end)
+
+
+end
+
+function module:Cleanup()
+	
+	if module.UpdateConnection then
+		module.UpdateConnection:Disconnect()
+		module.UpdateConnection = nil
+	end
+
+	for _, WindLine in ipairs(module.UpdateQueue) do
+		WindLine.Attachment0:Destroy()
+		WindLine.Attachment1:Destroy()
+		WindLine.Trail:Destroy()
+	end
+	table.clear(module.UpdateQueue)
+	
+end
+
+function module:Create(Settings)
+	debug.profilebegin("Add Wind Line")
+	
+	Settings = Settings or EMPTY_TABLE
+
+	local Lifetime = Settings.Lifetime or module.Lifetime
+	local Position = Settings.Position or (workspace.CurrentCamera.CFrame*CFrame.Angles(math.rad(math.random(-30,70)),math.rad(math.random(-80,80)),0))*CFrame.new(0,0,math.random(200,600)*-0.1).Position
+	local Direction = Settings.Direction or module.Direction
+	local Speed = Settings.Speed or module.Speed
+	if Speed <= 0 then return end
+
+	local Attachment0 = Instance.new("Attachment")
+	local Attachment1 = Instance.new("Attachment")
+	
+	local Trail = Instance.new("Trail")
+	Trail.Attachment0 = Attachment0
+	Trail.Attachment1 = Attachment1
+	Trail.WidthScale = NumberSequence.new({
+		NumberSequenceKeypoint.new(0,0.3),
+		NumberSequenceKeypoint.new(0.2,1),
+		NumberSequenceKeypoint.new(0.8,1),
+		NumberSequenceKeypoint.new(1,0.3),
+	})
+	Trail.Transparency = NumberSequence.new(0.7)
+	Trail.FaceCamera = true
+	Trail.Parent = Attachment0
+
+	Attachment0.WorldPosition = Position
+	Attachment1.WorldPosition = Position+OFFSET
+	
+	local WindLine = {
+		Attachment0 = Attachment0;
+		Attachment1 = Attachment1;
+		Trail = Trail;
+		Lifetime = Lifetime+(math.random(-10,10)*0.1);
+		Position = Position;
+		Direction = Direction;
+		Speed = Speed+(math.random(-10,10)*0.1);
+		StartClock = os.clock();
+		Seed = math.random(1,1000)*0.1;
+	}
+	
+	module.UpdateQueue[#module.UpdateQueue+1] = WindLine
+
+	Attachment0.Parent = Terrain
+	Attachment1.Parent = Terrain
+	
+	debug.profileend()
+end
+
+return module
+]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="ModuleScript" referent="RBX7c56d9a8d00d4ed08cbc3d4033e3da58">
+			<Properties>
+				<BinaryString name="AttributesSerialize"><![CDATA[AwAAAA0AAABXaW5kRGlyZWN0aW9uEQAAAD8AAAAAAAAAPwkAAABXaW5kUG93ZXIGAAAAAAAA
+4D8JAAAAV2luZFNwZWVkBgAAAAAAADRA]]></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">WindShake</string>
+				<string name="ScriptGuid">{DB0FAAE6-8AB7-4B29-8391-08103D0EDF8F}</string>
+				<ProtectedString name="Source"><![CDATA[--[=[
+
+WindShake- High performance wind effect for leaves and foliage
+by: boatbomber, CloneTrooper1019
+
+Docs: https://devforum.roblox.com/t/wind-shake-high-performance-wind-effect-for-leaves-and-foliage/1039806/1
+
+--]=]
+
+local CollectionService = game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
+local Settings = require(script.Settings)
+local Octree = require(script.Octree)
+
+local COLLECTION_TAG = "WindShake" -- The CollectionService tag to be watched and mounted automatically
+local UPDATE_HZ = 1/45 -- Update the object positions at 45 Hz.
+local COMPUTE_HZ = 1/30 -- Compute the object targets at 30 Hz.
+
+-- Use the script's attributes as the default settings.
+-- The table provided is a fallback if the attributes
+-- are undefined or using the wrong value types.
+
+local DEFAULT_SETTINGS = Settings.new(script, {
+	WindDirection = Vector3.new(0.5, 0, 0.5);
+	WindSpeed = 20;
+	WindPower = 0.5;
+})
+
+-----------------------------------------------------------------------------------------------------------------
+
+local ObjectShakeAddedEvent = Instance.new("BindableEvent")
+local ObjectShakeRemovedEvent = Instance.new("BindableEvent")
+local ObjectShakeUpdatedEvent = Instance.new("BindableEvent")
+local PausedEvent = Instance.new("BindableEvent")
+local ResumedEvent = Instance.new("BindableEvent")
+
+local WindShake = {
+	ObjectMetadata = {};
+	Octree = Octree.new();
+
+	Handled = 0;
+	Active = 0;
+	LastUpdate = os.clock();
+
+	ObjectShakeAdded = ObjectShakeAddedEvent.Event;
+	ObjectShakeRemoved = ObjectShakeRemovedEvent.Event;
+	ObjectShakeUpdated = ObjectShakeUpdatedEvent.Event;
+	Paused = PausedEvent.Event;
+	Resumed = ResumedEvent.Event;
+
+}
+
+export type WindShakeSettings = {
+	WindDirection: Vector3?,
+	WindSpeed: number?,
+	WindPower: number?,
+}
+
+function WindShake:Connect(funcName: string, event: RBXScriptSignal): RBXScriptConnection
+	local callback = self[funcName]
+	assert(typeof(callback) == "function", "Unknown function: " .. funcName)
+
+	return event:Connect(function (...)
+		return callback(self, ...)
+	end)
+end
+
+function WindShake:AddObjectShake(object: BasePart, settingsTable: WindShakeSettings?)
+	if typeof(object) ~= "Instance" then
+		return
+	end
+
+	if not object:IsA("BasePart") then
+		return
+	end
+
+	local metadata = self.ObjectMetadata
+
+	if metadata[object] then
+		return
+	else
+		self.Handled += 1
+	end
+
+	metadata[object] = {
+		Node = self.Octree:CreateNode(object.Position, object);
+		Settings = Settings.new(object, DEFAULT_SETTINGS);
+
+		Seed = math.random(1000) * 0.1;
+		Origin = object.CFrame;
+	}
+
+	self:UpdateObjectSettings(object, settingsTable)
+
+	ObjectShakeAddedEvent:Fire(object)
+end
+
+function WindShake:RemoveObjectShake(object: BasePart)
+	if typeof(object) ~= "Instance" then
+		return
+	end
+
+	local metadata = self.ObjectMetadata
+	local objMeta = metadata[object]
+
+	if objMeta then
+		self.Handled -= 1
+		metadata[object] = nil
+		objMeta.Settings:Destroy()
+		objMeta.Node:Destroy()
+
+		if object:IsA("BasePart") then
+			object.CFrame = objMeta.Origin
+		end
+	end
+
+	ObjectShakeRemovedEvent:Fire(object)
+end
+
+function WindShake:Update()
+	local now = os.clock()
+	local dt = now - self.LastUpdate
+
+	if dt < UPDATE_HZ then
+		return
+	end
+
+	self.LastUpdate = now
+
+	debug.profilebegin("WindShake")
+
+	local camera = workspace.CurrentCamera
+	local cameraCF = camera and camera.CFrame
+
+	debug.profilebegin("Octree Search")
+	local updateObjects = self.Octree:RadiusSearch(cameraCF.Position + (cameraCF.LookVector * 115), 120)
+	debug.profileend()
+
+	local activeCount = #updateObjects
+
+	self.Active = activeCount
+
+	if activeCount < 1 then
+		return
+	end
+
+	local step = math.min(1, dt * 8)
+	local cfTable = table.create(activeCount)
+	local objectMetadata = self.ObjectMetadata
+
+	debug.profilebegin("Calc")
+	for i, object in ipairs(updateObjects) do
+		local objMeta = objectMetadata[object]
+		local lastComp = objMeta.LastCompute or 0
+
+		local origin = objMeta.Origin
+		local current = objMeta.CFrame or origin
+
+		if (now - lastComp) > COMPUTE_HZ then
+			local objSettings = objMeta.Settings
+
+			local seed = objMeta.Seed
+			local amp = objSettings.WindPower * 0.1
+
+			local freq = now * (objSettings.WindSpeed * 0.08)
+			local rotX = math.noise(freq, 0, seed) * amp
+			local rotY = math.noise(freq, 0, -seed) * amp
+			local rotZ = math.noise(freq, 0, seed+seed) * amp
+			local offset = object.PivotOffset
+			local worldpivot = origin * offset
+
+			objMeta.Target = (worldpivot * CFrame.Angles(rotX, rotY, rotZ) + objSettings.WindDirection * ((0.5 + math.noise(freq, seed, seed)) * amp)) * offset:Inverse()
+
+			objMeta.LastCompute = now
+		end
+
+		current = current:Lerp(objMeta.Target, step)
+		objMeta.CFrame = current
+		cfTable[i] = current
+	end
+	debug.profileend()
+
+	workspace:BulkMoveTo(updateObjects, cfTable, Enum.BulkMoveMode.FireCFrameChanged)
+	debug.profileend()
+end
+
+function WindShake:Pause()
+	if self.UpdateConnection then
+		self.UpdateConnection:Disconnect()
+		self.UpdateConnection = nil
+	end
+
+	self.Active = 0
+	self.Running = false
+
+	PausedEvent:Fire()
+end
+
+function WindShake:Resume()
+	if self.Running then
+		return
+	else
+		self.Running = true
+	end
+
+	-- Connect updater
+	self.UpdateConnection = self:Connect("Update", RunService.Heartbeat)
+
+	ResumedEvent:Fire()
+end
+
+function WindShake:Init()
+	if self.Initialized then
+		return
+	else
+		self.Initialized = true
+	end
+
+	-- Define attributes if they're undefined.
+	local power = script:GetAttribute("WindPower")
+	local speed = script:GetAttribute("WindSpeed")
+	local direction = script:GetAttribute("WindDirection")
+
+	if typeof(power) ~= "number" then
+		script:SetAttribute("WindPower", DEFAULT_SETTINGS.WindPower)
+	end
+
+	if typeof(speed) ~= "number" then
+		script:SetAttribute("WindSpeed", DEFAULT_SETTINGS.WindSpeed)
+	end
+
+	if typeof(direction) ~= "Vector3" then
+		script:SetAttribute("WindDirection", DEFAULT_SETTINGS.WindDirection)
+	end
+
+	-- Clear any old stuff.
+	self:Cleanup()
+
+	-- Wire up tag listeners.
+	local windShakeAdded = CollectionService:GetInstanceAddedSignal(COLLECTION_TAG)
+	self.AddedConnection = self:Connect("AddObjectShake", windShakeAdded)
+
+	local windShakeRemoved = CollectionService:GetInstanceRemovedSignal(COLLECTION_TAG)
+	self.RemovedConnection = self:Connect("RemoveObjectShake", windShakeRemoved)
+
+	for _,object in pairs(CollectionService:GetTagged(COLLECTION_TAG)) do
+		self:AddObjectShake(object)
+	end
+
+	-- Automatically start.
+	self:Resume()
+end
+
+function WindShake:Cleanup()
+	if not self.Initialized then
+		return
+	end
+
+	self:Pause()
+
+	if self.AddedConnection then
+		self.AddedConnection:Disconnect()
+		self.AddedConnection = nil
+	end
+
+	if self.RemovedConnection then
+		self.RemovedConnection:Disconnect()
+		self.RemovedConnection = nil
+	end
+
+	table.clear(self.ObjectMetadata)
+	self.Octree:ClearNodes()
+
+	self.Handled = 0
+	self.Active = 0
+	self.Initialized = false
+end
+
+function WindShake:UpdateObjectSettings(object: Instance, settingsTable: WindShakeSettings)
+	if typeof(object) ~= "Instance" then
+		return
+	end
+
+	if typeof(settingsTable) ~= "table" then
+		return
+	end
+
+	if (not self.ObjectMetadata[object]) and (object ~= script) then
+		return
+	end
+
+	for key, value in pairs(settingsTable) do
+		object:SetAttribute(key, value)
+	end
+
+	ObjectShakeUpdatedEvent:Fire(object)
+end
+
+function WindShake:UpdateAllObjectSettings(settingsTable: WindShakeSettings)
+	if typeof(settingsTable) ~= "table" then
+		return
+	end
+
+	for obj, objMeta in pairs(self.ObjectMetadata) do
+		for key, value in pairs(settingsTable) do
+			obj:SetAttribute(key, value)
+		end
+		ObjectShakeUpdatedEvent:Fire(obj)
+	end
+end
+
+function WindShake:SetDefaultSettings(settingsTable: WindShakeSettings)
+	self:UpdateObjectSettings(script, settingsTable)
+end
+
+return WindShake]]></ProtectedString>
+				<int64 name="SourceAssetId">6377120469</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="ModuleScript" referent="RBXf416b85eecbf4a34a170ac4999a23f71">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Settings</string>
+					<string name="ScriptGuid">{18031236-F7A2-43A7-84E4-423A39FA2102}</string>
+					<ProtectedString name="Source"><![CDATA[local Settings = {}
+
+local SettingTypes = {
+	WindPower = "number";
+	WindSpeed = "number";
+	WindDirection = "Vector3";
+}
+
+function Settings.new(object, base)
+	local inst = table.create(3)
+
+	-- Initial settings
+
+	local WindPower = object:GetAttribute("WindPower")
+	local WindSpeed = object:GetAttribute("WindSpeed")
+	local WindDirection = object:GetAttribute("WindDirection")
+
+	inst.WindPower = typeof(WindPower) == SettingTypes.WindPower and WindPower or base.WindPower
+	inst.WindSpeed = typeof(WindSpeed) == SettingTypes.WindSpeed and WindSpeed or base.WindSpeed
+	inst.WindDirection = typeof(WindDirection) == SettingTypes.WindDirection and WindDirection or base.WindDirection
+
+	-- Update settings on event
+
+	local PowerConnection = object:GetAttributeChangedSignal("WindPower"):Connect(function()
+		WindPower = object:GetAttribute("WindPower")
+		inst.WindPower = typeof(WindPower) == SettingTypes.WindPower and WindPower or base.WindPower
+	end)
+
+	local SpeedConnection = object:GetAttributeChangedSignal("WindSpeed"):Connect(function()
+		WindSpeed = object:GetAttribute("WindSpeed")
+		inst.WindSpeed = typeof(WindSpeed) == SettingTypes.WindSpeed and WindSpeed or base.WindSpeed
+	end)
+
+	local DirectionConnection = object:GetAttributeChangedSignal("WindDirection"):Connect(function()
+		WindDirection = object:GetAttribute("WindDirection")
+		inst.WindDirection = typeof(WindDirection) == SettingTypes.WindDirection and WindDirection or base.WindDirection
+	end)
+
+	-- Cleanup function for when shake is removed or object is unloaded
+
+	function inst:Destroy()
+		PowerConnection:Disconnect()
+		SpeedConnection:Disconnect()
+		DirectionConnection:Disconnect()
+		table.clear(inst)
+	end
+
+	return inst
+end
+
+return Settings]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXebb8a0bb1fa042a4bf38d607d8beafb8">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Octree</string>
+					<string name="ScriptGuid">{AAC1EEA7-EA87-4478-B9A0-119CE9F820E7}</string>
+					<ProtectedString name="Source"><![CDATA[--- Octree implementation
+-- @classmod Octree
+
+-- Original by Quenty, Optimized by howmanysmall
+
+local OctreeNode = require(script.OctreeNode)
+local OctreeRegionUtils = require(script.OctreeRegionUtils)
+
+local EPSILON = 1e-9
+local SQRT_3_OVER_2 = math.sqrt(3) / 2
+local SUB_REGION_POSITION_OFFSET = {
+	{0.25, 0.25, -0.25};
+	{-0.25, 0.25, -0.25};
+	{0.25, 0.25, 0.25};
+	{-0.25, 0.25, 0.25};
+	{0.25, -0.25, -0.25};
+	{-0.25, -0.25, -0.25};
+	{0.25, -0.25, 0.25};
+	{-0.25, -0.25, 0.25};
+}
+
+local Octree = {ClassName = "Octree"}
+Octree.__index = Octree
+
+local OctreeNode_new = OctreeNode.new
+local OctreeRegionUtils_GetNeighborsWithinRadius = OctreeRegionUtils.GetNeighborsWithinRadius
+
+function Octree.new()
+	return setmetatable({
+		MaxDepth = 4;
+		MaxRegionSize = table.create(3, 512);
+		RegionHashMap = {};
+	}, Octree)
+end
+
+function Octree:ClearNodes()
+	self.MaxDepth = 4
+	self.MaxRegionSize = table.create(3, 512)
+	table.clear(self.RegionHashMap)
+end
+
+function Octree:GetAllNodes()
+	local Options = {}
+	local Length = 0
+
+	for _, RegionList in next, self.RegionHashMap do
+		for _, Region in ipairs(RegionList) do
+			for Node in next, Region.Nodes do
+				Length += 1
+				Options[Length] = Node
+			end
+		end
+	end
+
+	return Options
+end
+
+function Octree:CreateNode(Position: Vector3, Object)
+	if typeof(Position) ~= "Vector3" then
+		error("Bad position value")
+	end
+
+	if not Object then
+		error("Bad object value.")
+	end
+
+	local Node = OctreeNode_new(self, Object)
+	Node:SetPosition(Position)
+	return Node
+end
+
+function Octree:RadiusSearch(Position: Vector3, Radius: number)
+	if typeof(Position) ~= "Vector3" then
+		error("Bad position value")
+	end
+
+	if type(Radius) ~= "number" then
+		error("Bad radius value")
+	end
+
+	local PositionX, PositionY, PositionZ = Position.X, Position.Y, Position.Z
+	local ObjectsFound = {}
+	local NodeDistances2 = {}
+	local ObjectsLength = 0
+	local DistancesLength = 0
+
+	local Diameter = self.MaxRegionSize[1]
+	local SearchRadius = Radius + SQRT_3_OVER_2 * Diameter
+	local SearchRadiusSquared = SearchRadius * SearchRadius + EPSILON
+
+	for _, RegionList in next, self.RegionHashMap do
+		for _, Region in ipairs(RegionList) do
+			local RegionPosition = Region.Position
+			local RegionPositionX = RegionPosition[1]
+			local RegionPositionY = RegionPosition[2]
+			local RegionPositionZ = RegionPosition[3]
+
+			local OffsetX, OffsetY, OffsetZ = PositionX - RegionPositionX, PositionY - RegionPositionY, PositionZ - RegionPositionZ
+			local Distance2 = OffsetX * OffsetX + OffsetY * OffsetY + OffsetZ * OffsetZ
+
+			if Distance2 <= SearchRadiusSquared then
+				ObjectsLength, DistancesLength = OctreeRegionUtils_GetNeighborsWithinRadius(Region, Radius, PositionX, PositionY, PositionZ, ObjectsFound, NodeDistances2, self.MaxDepth, ObjectsLength, DistancesLength)
+			end
+		end
+	end
+
+	return ObjectsFound, NodeDistances2
+end
+
+local function NearestNeighborSort(A, B)
+	return A.Distance2 < B.Distance2
+end
+
+function Octree:KNearestNeighborsSearch(Position: Vector3, K: number, Radius: number)
+	if typeof(Position) ~= "Vector3" then
+		error("Bad position value")
+	end
+
+	if type(Radius) ~= "number" then
+		error("Bad radius value")
+	end
+
+	local PositionX, PositionY, PositionZ = Position.X, Position.Y, Position.Z
+	local Objects = {}
+	local NodeDistances2 = {}
+	local ObjectsLength = 0
+	local DistancesLength = 0
+
+	local Diameter = self.MaxRegionSize[1]
+	local SearchRadius = Radius + SQRT_3_OVER_2 * Diameter
+	local SearchRadiusSquared = SearchRadius * SearchRadius + EPSILON
+
+	for _, RegionList in next, self.RegionHashMap do
+		for _, Region in ipairs(RegionList) do
+			local RegionPosition = Region.Position
+			local RegionPositionX = RegionPosition[1]
+			local RegionPositionY = RegionPosition[2]
+			local RegionPositionZ = RegionPosition[3]
+
+			local OffsetX, OffsetY, OffsetZ = PositionX - RegionPositionX, PositionY - RegionPositionY, PositionZ - RegionPositionZ
+			local Distance2 = OffsetX * OffsetX + OffsetY * OffsetY + OffsetZ * OffsetZ
+
+			if Distance2 <= SearchRadiusSquared then
+				ObjectsLength, DistancesLength = OctreeRegionUtils_GetNeighborsWithinRadius(Region, Radius, PositionX, PositionY, PositionZ, Objects, NodeDistances2, self.MaxDepth, ObjectsLength, DistancesLength)
+			end
+		end
+	end
+
+	local Sortable = table.create(DistancesLength)
+	for Index, Distance2 in ipairs(NodeDistances2) do
+		Sortable[Index] = {
+			Distance2 = Distance2;
+			Index = Index;
+		}
+	end
+
+	table.sort(Sortable, NearestNeighborSort)
+
+	local ArrayLength = math.min(DistancesLength, K)
+	local KNearest = table.create(ArrayLength)
+	local KNearestDistance2 = table.create(ArrayLength)
+	for Index = 1, ArrayLength do
+		local Sorted = Sortable[Index]
+		KNearestDistance2[Index] = Sorted.Distance2
+		KNearest[Index] = Objects[Sorted.Index]
+	end
+
+	return KNearest, KNearestDistance2
+end
+
+local function GetOrCreateRegion(self, PositionX: number, PositionY: number, PositionZ: number)
+	local RegionHashMap = self.RegionHashMap
+	local MaxRegionSize = self.MaxRegionSize
+	local X, Y, Z = MaxRegionSize[1], MaxRegionSize[2], MaxRegionSize[3]
+	local CX, CY, CZ = math.floor(PositionX / X + 0.5), math.floor(PositionY / Y + 0.5), math.floor(PositionZ / Z + 0.5)
+	local Hash = CX * 73856093 + CY * 19351301 + CZ * 83492791
+
+	local RegionList = RegionHashMap[Hash]
+	if not RegionList then
+		RegionList = {}
+		RegionHashMap[Hash] = RegionList
+	end
+
+	local RegionPositionX, RegionPositionY, RegionPositionZ = X * CX, Y * CY, Z * CZ
+	for _, Region in ipairs(RegionList) do
+		local Position = Region.Position
+		if Position[1] == RegionPositionX and Position[2] == RegionPositionY and Position[3] == RegionPositionZ then
+			return Region
+		end
+	end
+
+	local HalfSizeX, HalfSizeY, HalfSizeZ = X / 2, Y / 2, Z / 2
+
+	local LowerBoundsArray = {RegionPositionX - HalfSizeX, RegionPositionY - HalfSizeY, RegionPositionZ - HalfSizeZ}
+	local PositionArray = {RegionPositionX, RegionPositionY, RegionPositionZ}
+	local SizeArray = {X, Y, Z}
+	local UpperBoundsArray = {RegionPositionX + HalfSizeX, RegionPositionY + HalfSizeY, RegionPositionZ + HalfSizeZ}
+
+	local Region = {
+		Depth = 1;
+		LowerBounds = LowerBoundsArray;
+		NodeCount = 0;
+		Nodes = {}; -- [node] = true (contains subchild nodes too)
+		Parent = nil;
+		ParentIndex = nil;
+		Position = PositionArray;
+		Size = SizeArray; -- { sx, sy, sz }
+		SubRegions = {};
+		UpperBounds = UpperBoundsArray;
+	}
+
+	table.insert(RegionList, Region)
+	return Region
+end
+
+function Octree:GetOrCreateLowestSubRegion(PositionX: number, PositionY: number, PositionZ: number)
+	local Region = GetOrCreateRegion(self, PositionX, PositionY, PositionZ)
+	local MaxDepth = self.MaxDepth
+	local Current = Region
+	for _ = Region.Depth, MaxDepth do
+		local CurrentPosition = Current.Position
+		local Index = PositionX > CurrentPosition[1] and 1 or 2
+		if PositionY <= CurrentPosition[2] then
+			Index += 4
+		end
+
+		if PositionZ >= CurrentPosition[3] then
+			Index += 2
+		end
+
+		local SubRegions = Current.SubRegions
+		local Next = SubRegions[Index]
+
+		-- construct
+		if not Next then
+			local Size = Current.Size
+			local Multiplier = SUB_REGION_POSITION_OFFSET[Index]
+
+			local X, Y, Z = Size[1], Size[2], Size[3]
+			local CurrentPositionX = CurrentPosition[1] + Multiplier[1] * X
+			local CurrentPositionY = CurrentPosition[2] + Multiplier[2] * Y
+			local CurrentPositionZ = CurrentPosition[3] + Multiplier[3] * Z
+			local SizeX, SizeY, SizeZ = X / 2, Y / 2, Z / 2
+
+			local HalfSizeX, HalfSizeY, HalfSizeZ = SizeX / 2, SizeY / 2, SizeZ / 2
+
+			local LowerBoundsArray = {CurrentPositionX - HalfSizeX, CurrentPositionY - HalfSizeY, CurrentPositionZ - HalfSizeZ}
+			local PositionArray = {CurrentPositionX, CurrentPositionY, CurrentPositionZ}
+			local SizeArray = {SizeX, SizeY, SizeZ}
+			local UpperBoundsArray = {CurrentPositionX + HalfSizeX, CurrentPositionY + HalfSizeY, CurrentPositionZ + HalfSizeZ}
+
+			Next = {
+				Depth = Current and (Current.Depth + 1) or 1;
+				LowerBounds = LowerBoundsArray;
+				NodeCount = 0;
+				Nodes = {}; -- [node] = true (contains subchild nodes too)
+				Parent = Current;
+				ParentIndex = Index;
+				Position = PositionArray;
+				Size = SizeArray; -- { sx, sy, sz }
+				SubRegions = {};
+				UpperBounds = UpperBoundsArray;
+			}
+
+			-- Next = OctreeRegionUtils.CreateSubRegion(Current, Index)
+			SubRegions[Index] = Next
+		end
+
+		-- iterate
+		Current = Next
+	end
+
+	return Current
+end
+
+return Octree]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="ModuleScript" referent="RBXedabe8941f0f40ebb7ac03fb6fa03894">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+						<bool name="DefinesCapabilities">false</bool>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">OctreeNode</string>
+						<string name="ScriptGuid">{C884DE13-85C5-49F8-962B-FEAC50BAEC6C}</string>
+						<ProtectedString name="Source"><![CDATA[--- Basic node interacting with the octree
+-- @classmod OctreeNode
+
+local OctreeNode = {ClassName = "OctreeNode"}
+OctreeNode.__index = OctreeNode
+
+function OctreeNode.new(Octree, Object)
+	return setmetatable({
+		Octree = Octree or error("No octree");
+		Object = Object or error("No object");
+
+		CurrentLowestRegion = nil;
+		Position = nil;
+		PositionX = nil;
+		PositionY = nil;
+		PositionZ = nil;
+	}, OctreeNode)
+end
+
+function OctreeNode:KNearestNeighborsSearch(K: number, Radius: number)
+	return self.Octree:KNearestNeighborsSearch(self.Position, K, Radius)
+end
+
+function OctreeNode:GetObject()
+	warn("OctreeNode:GetObject is deprecated.")
+	return self.Object
+end
+
+function OctreeNode:RadiusSearch(Radius: number)
+	return self.Octree:RadiusSearch(self.Position, Radius)
+end
+
+function OctreeNode:GetPosition()
+	warn("OctreeNode:GetPosition is deprecated.")
+	return self.Position
+end
+
+function OctreeNode:GetRawPosition(): (number, number, number)
+	return self.PositionX, self.PositionY, self.PositionZ
+end
+
+function OctreeNode:SetPosition(Position: Vector3)
+	if self.Position == Position then
+		return
+	end
+
+	local PositionX, PositionY, PositionZ = Position.X, Position.Y, Position.Z
+
+	self.PositionX = PositionX
+	self.PositionY = PositionY
+	self.PositionZ = PositionZ
+	self.Position = Position
+
+	if self.CurrentLowestRegion then
+		local Region = self.CurrentLowestRegion
+		local LowerBounds = Region.LowerBounds
+		local UpperBounds = Region.UpperBounds
+		if PositionX >= LowerBounds[1] and PositionX <= UpperBounds[1] and PositionY >= LowerBounds[2] and PositionY <= UpperBounds[2] and PositionZ >= LowerBounds[3] and PositionZ <= UpperBounds[3] then
+			return
+		end
+	end
+
+	local NewLowestRegion = self.Octree:GetOrCreateLowestSubRegion(PositionX, PositionY, PositionZ)
+	if self.CurrentLowestRegion then
+		-- OctreeRegionUtils_MoveNode(self.CurrentLowestRegion, NewLowestRegion, self)
+		local FromLowest = self.CurrentLowestRegion
+		if FromLowest.Depth ~= NewLowestRegion.Depth then
+			error("fromLowest.Depth ~= toLowest.Depth")
+		end
+
+		if FromLowest == NewLowestRegion then
+			error("fromLowest == toLowest")
+		end
+
+		local CurrentFrom = FromLowest
+		local CurrentTo = NewLowestRegion
+
+		while CurrentFrom ~= CurrentTo do
+			-- remove from current
+			local CurrentFromNodes = CurrentFrom.Nodes
+			if not CurrentFromNodes[self] then
+				error("CurrentFrom.Nodes doesn't have a node here.")
+			end
+
+			local NodeCount = CurrentFrom.NodeCount
+			if NodeCount <= 0 then
+				error("NodeCount is <= 0.")
+			end
+
+			NodeCount -= 1
+			CurrentFromNodes[self] = nil
+			CurrentFrom.NodeCount = NodeCount
+
+			-- remove subregion!
+			local ParentIndex = CurrentFrom.ParentIndex
+			if NodeCount <= 0 and ParentIndex then
+				local Parent = CurrentFrom.Parent
+				if not Parent then
+					error("CurrentFrom.Parent doesn't exist.")
+				end
+
+				local SubRegions = Parent.SubRegions
+				if SubRegions[ParentIndex] ~= CurrentFrom then
+					error("Failed equality check.")
+				end
+
+				SubRegions[ParentIndex] = nil
+			end
+
+			local CurrentToNodes = CurrentTo.Nodes
+			if CurrentToNodes[self] then
+				error("CurrentTo.Nodes already has a node here.")
+			end
+
+			CurrentToNodes[self] = self
+			CurrentTo.NodeCount += 1
+
+			CurrentFrom = CurrentFrom.Parent
+			CurrentTo = CurrentTo.Parent
+		end
+	else
+		local Current = NewLowestRegion
+		while Current do
+			local CurrentNodes = Current.Nodes
+			if not CurrentNodes[self] then
+				CurrentNodes[self] = self
+				Current.NodeCount += 1
+			end
+
+			Current = Current.Parent
+		end
+	end
+
+	self.CurrentLowestRegion = NewLowestRegion
+end
+
+function OctreeNode:Destroy()
+	local LowestSubregion = self.CurrentLowestRegion
+	if LowestSubregion then
+		local Current = LowestSubregion
+
+		while Current do
+			local Nodes = Current.Nodes
+			if not Nodes[self] then
+				error("CurrentFrom.Nodes doesn't have a node here.")
+			end
+
+			local NodeCount = Current.NodeCount
+			if NodeCount <= 0 then
+				error("NodeCount is <= 0.")
+			end
+
+			NodeCount -= 1
+			Nodes[self] = nil
+			Current.NodeCount = NodeCount
+
+			-- remove subregion!
+			local Parent = Current.Parent
+			local ParentIndex = Current.ParentIndex
+			if NodeCount <= 0 and ParentIndex then
+				if not Parent then
+					error("Current.Parent doesn't exist.")
+				end
+
+				local SubRegions = Parent.SubRegions
+				if SubRegions[ParentIndex] ~= Current then
+					error("Failed equality check.")
+				end
+
+				SubRegions[ParentIndex] = nil
+			end
+
+			Current = Parent
+		end
+	end
+end
+
+return OctreeNode]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBXdde5eb15e5b54ac59c245adac087fe6c">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+						<bool name="DefinesCapabilities">false</bool>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">OctreeRegionUtils</string>
+						<string name="ScriptGuid">{74361A03-48C1-46AE-8454-81BF4D172FE1}</string>
+						<ProtectedString name="Source"><![CDATA[--- Octree implementation
+-- @module OctreeRegionUtils
+
+local EPSILON = 1e-6
+local SQRT_3_OVER_2 = math.sqrt(3) / 2
+local SUB_REGION_POSITION_OFFSET = {
+	{0.25, 0.25, -0.25};
+	{-0.25, 0.25, -0.25};
+	{0.25, 0.25, 0.25};
+	{-0.25, 0.25, 0.25};
+	{0.25, -0.25, -0.25};
+	{-0.25, -0.25, -0.25};
+	{0.25, -0.25, 0.25};
+	{-0.25, -0.25, 0.25};
+}
+
+local OctreeRegionUtils = {}
+
+-- See basic algorithm:
+-- luacheck: push ignore
+-- https://github.com/PointCloudLibrary/pcl/blob/29f192af57a3e7bdde6ff490669b211d8148378f/octree/include/pcl/octree/impl/octree_search.hpp#L309
+-- luacheck: pop
+local function GetNeighborsWithinRadius(Region, Radius, PositionX, PositionY, PositionZ, ObjectsFound, NodeDistances2, MaxDepth, ObjectsLength, DistancesLength)
+	if not MaxDepth then
+		error("Missing MaxDepth.")
+	end
+
+	local SearchRadius = Radius + SQRT_3_OVER_2 * (Region.Size[1] / 2)
+	local SearchRadiusSquared = SearchRadius * SearchRadius + EPSILON
+	local RadiusSquared = Radius * Radius
+
+	-- for each child
+	for _, ChildRegion in next, Region.SubRegions do
+		local ChildPosition = ChildRegion.Position
+		local ChildPositionX = ChildPosition[1]
+		local ChildPositionY = ChildPosition[2]
+		local ChildPositionZ = ChildPosition[3]
+
+		local OffsetX = PositionX - ChildPositionX
+		local OffsetY = PositionY - ChildPositionY
+		local OffsetZ = PositionZ - ChildPositionZ
+		local Distance2 = OffsetX * OffsetX + OffsetY * OffsetY + OffsetZ * OffsetZ
+
+		-- within search radius
+		if Distance2 <= SearchRadiusSquared then
+			if ChildRegion.Depth == MaxDepth then
+				for Node in next, ChildRegion.Nodes do
+					local NodePositionX = Node.PositionX
+					local NodePositionY = Node.PositionY
+					local NodePositionZ = Node.PositionZ
+
+					local NodeOffsetX = NodePositionX - PositionX
+					local NodeOffsetY = NodePositionY - PositionY
+					local NodeOffsetZ = NodePositionZ - PositionZ
+					local NodeDistance2 = NodeOffsetX * NodeOffsetX + NodeOffsetY * NodeOffsetY + NodeOffsetZ * NodeOffsetZ
+
+					if NodeDistance2 <= RadiusSquared then
+						ObjectsLength += 1
+						DistancesLength += 1
+						ObjectsFound[ObjectsLength] = Node.Object
+						NodeDistances2[DistancesLength] = NodeDistance2
+					end
+				end
+			else
+				ObjectsLength, DistancesLength = GetNeighborsWithinRadius(ChildRegion, Radius, PositionX, PositionY, PositionZ, ObjectsFound, NodeDistances2, MaxDepth, ObjectsLength, DistancesLength)
+			end
+		end
+	end
+
+	return ObjectsLength, DistancesLength
+end
+
+OctreeRegionUtils.GetNeighborsWithinRadius = GetNeighborsWithinRadius
+return OctreeRegionUtils]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+		</Item>
+	</Item>
+</roblox>
