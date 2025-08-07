@@ -35,6 +35,44 @@ local function getScriptExtension(scriptType)
     end
 end
 
+-- Helper function to check if a class should be saved as rbxmx
+local function shouldSaveAsRbxmx(className)
+    local rbxmxClasses = {
+        "Part", "Texture", "TextLabel", "ScreenGui", "Decal", "Attachment", 
+        "Motor6D", "Animator", "HumanoidDescription", "Humanoid", 
+        "BodyPartDescription", "BodyColor", "Shirt", "Pants", "SpecialMesh", 
+        "KeyframeSequence", "Keyframe", "Pose", "Highlight", "BoolValue", 
+        "ObjectValue", "ParticleEmitter", "StringValue", "NumberValue", 
+        "BindableFunction", "Sound", "SpawnLocation", "Weld", "Sky", 
+        "Atmosphere", "Model"
+    }
+    
+    -- Check for classes ending with "Effect"
+    if className:match("Effect$") then
+        return true
+    end
+    
+    -- Check if className is in the list
+    for _, class in ipairs(rbxmxClasses) do
+        if className == class then
+            return true
+        end
+    end
+    
+    return false
+end
+
+-- Helper function to check if a ModuleScript has nested children (should use barrier pattern)
+local function moduleHasNestedChildren(instance)
+    local children = instance:GetChildren()
+    for _, child in ipairs(children) do
+        if child.ClassName == "ModuleScript" or child.ClassName == "Script" or child.ClassName == "LocalScript" then
+            return true
+        end
+    end
+    return false
+end
+
 -- Helper function to sanitize file names
 local function sanitizeFileName(name)
     return name:gsub("[^%w%-%_%. ]", "_"):gsub("%s+", "_")
@@ -53,39 +91,102 @@ local function extractScripts(instance, currentPath)
         local childName = sanitizeFileName(child.Name)
         local childPath = currentPath .. "/" .. childName
         
-        if child.ClassName == "Script" or child.ClassName == "LocalScript" or child.ClassName == "ModuleScript" then
-            -- Extract script
-            local scriptExt = getScriptExtension(child.ClassName)
-            local scriptPath = childPath .. scriptExt
-            
+        if child.ClassName == "Model" then
+            -- Rule 1: Model -> convert all items inside to individual rbxmx files
+            print("  Processing Model: " .. child.Name)
             ensureDir(currentPath)
+            local modelPath = childPath .. ".rbxmx"
+            print("  Saving model: " .. modelPath)
+            remodel.writeModelFile(modelPath, child)
             
-            -- Check if Source property exists (it might not in some instances)
-            local hasSource, source = pcall(function() return child.Source end)
-            if hasSource and source and source ~= "" then
-                print("  Extracting script: " .. scriptPath)
-                remodel.writeFile(scriptPath, source)
-            else
-                print("  Warning: No source or empty script: " .. scriptPath)
-                remodel.writeFile(scriptPath, "-- No source found for script: " .. child.Name)
-            end
+            -- Also recurse into children to extract any scripts inside
+            extractScripts(child, childPath)
+            
         elseif child.ClassName == "Folder" then
-            -- Create directory and recurse
+            -- Rule 2: Folder -> find all items inside to process further
+            print("  Processing Folder: " .. child.Name)
             ensureDir(childPath)
             extractScripts(child, childPath)
+            
+        elseif child.ClassName == "ModuleScript" then
+            if moduleHasNestedChildren(child) then
+                -- Rule 4: ModuleScript with nested children -> use barrier pattern
+                print("  Processing ModuleScript with children (barrier pattern): " .. child.Name)
+                ensureDir(childPath)
+                
+                -- Create init.lua for the main module
+                local initPath = childPath .. "/init.lua"
+                local hasSource, source = pcall(function() return child.Source end)
+                if hasSource and source and source ~= "" then
+                    print("    Creating init.lua: " .. initPath)
+                    remodel.writeFile(initPath, source)
+                else
+                    print("    Warning: No source for ModuleScript: " .. child.Name)
+                    remodel.writeFile(initPath, "-- No source found for ModuleScript: " .. child.Name)
+                end
+                
+                -- Process children
+                extractScripts(child, childPath)
+            else
+                -- Rule 3: Single ModuleScript -> convert to script.lua
+                print("  Processing single ModuleScript: " .. child.Name)
+                local scriptPath = childPath .. ".lua"
+                ensureDir(currentPath)
+                
+                local hasSource, source = pcall(function() return child.Source end)
+                if hasSource and source and source ~= "" then
+                    print("    Extracting ModuleScript: " .. scriptPath)
+                    remodel.writeFile(scriptPath, source)
+                else
+                    print("    Warning: No source for ModuleScript: " .. child.Name)
+                    remodel.writeFile(scriptPath, "-- No source found for ModuleScript: " .. child.Name)
+                end
+            end
+            
+        elseif child.ClassName == "Script" or child.ClassName == "LocalScript" then
+            -- Rule 6: Single Script/LocalScript -> convert to script.lua
+            print("  Processing " .. child.ClassName .. ": " .. child.Name)
+            local scriptExt = getScriptExtension(child.ClassName)
+            local scriptPath = childPath .. scriptExt
+            ensureDir(currentPath)
+            
+            local hasSource, source = pcall(function() return child.Source end)
+            if hasSource and source and source ~= "" then
+                print("    Extracting script: " .. scriptPath)
+                remodel.writeFile(scriptPath, source)
+            else
+                print("    Warning: No source for script: " .. child.Name)
+                remodel.writeFile(scriptPath, "-- No source found for script: " .. child.Name)
+            end
+            
+            -- Also process any children (rare but possible)
+            if #child:GetChildren() > 0 then
+                extractScripts(child, childPath)
+            end
+            
+        elseif shouldSaveAsRbxmx(child.ClassName) then
+            -- Rule 5: Specific classes -> convert to rbxmx file
+            print("  Processing " .. child.ClassName .. " as rbxmx: " .. child.Name)
+            ensureDir(currentPath)
+            local modelPath = childPath .. ".rbxmx"
+            print("    Saving as rbxmx: " .. modelPath)
+            remodel.writeModelFile(modelPath, child)
+            
+            -- Also recurse into children if they exist
+            if #child:GetChildren() > 0 then
+                extractScripts(child, childPath)
+            end
+            
         else
-            -- For other objects (Parts, Models, etc.), save as rbxmx
+            -- Default case: save as rbxmx and recurse
+            print("  Processing unknown class " .. child.ClassName .. ": " .. child.Name)
             if #child:GetChildren() > 0 then
                 ensureDir(currentPath)
                 local modelPath = childPath .. ".rbxmx"
-                print("  Saving model: " .. modelPath)
+                print("    Saving unknown class as rbxmx: " .. modelPath)
                 remodel.writeModelFile(modelPath, child)
+                extractScripts(child, childPath)
             end
-        end
-        
-        -- Recurse into children regardless of type
-        if #child:GetChildren() > 0 then
-            extractScripts(child, childPath)
         end
     end
 end
