@@ -19,10 +19,12 @@
       "StarterCharacterScripts": {
         "$path": "src/StarterPlayer/StarterCharacterScripts"
       },
+      "StarterCharacter": {
+        "$path": "src/StarterPlayer/StarterCharacter"
+      },
       "StarterPlayerScripts": {
         "$path": "src/StarterPlayer/StarterPlayerScripts"
-      },
-      "$path": "src/StarterPlayer"
+      }
     },
 
     "StarterGui": {
