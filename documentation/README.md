@@ -18,15 +18,18 @@ documentation/
 ├── 02-extraction/               # Script and asset extraction
 │   ├── 01-remodel-installation.md
 │   ├── 02-extraction-script.md
-│   └── 03-running-extraction.md
+│   ├── 03-running-extraction.md
+│   └── 04-python-extractor-solution.md
 ├── 03-migration/               # File organization and migration
 │   ├── 01-structure-mapping.md
 │   ├── 02-file-migration.md
-│   └── 03-final-cleanup.md
+│   ├── 03-final-cleanup.md
+│   └── 04-python-extraction-migration.md
 ├── assets/                     # Supporting images and files
 └── scripts/                    # All scripts used in the process
     ├── extract-scripts.lua
-    └── install-remodel.sh
+    ├── install-remodel.sh
+    └── rbxmx-script-extractor.py
 ```
 
 ## 🎯 What This Process Achieves
@@ -49,29 +52,55 @@ If you want to replicate this process:
 
 **Before**: Single .rbxm/.rbxmx model file with embedded scripts
 **After**: Complete Rojo project with:
-- 90+ Lua script files ready for development
-- 30+ modules (CameraShaker, FastCast, Zone, etc.)
-- 6 different map difficulty levels
-- Proper Roblox service organization
-- Full Lighting and Workspace assets
+- **108 working script files** with real implementations
+- **50+ professional modules** (CameraShaker, FastCastRedux, RaycastHitboxV4, etc.)
+- **Complete movement systems** (sliding, ledge grab, camera effects)
+- **6 different map difficulty levels** with gameplay scripts
+- **Proper Roblox service organization** for development
+- **Professional-grade code examples** from experienced developers
 
 ## ⚡ Key Tools Used
 
-- **Gemini AI**: For initial structure analysis
-- **Claude AI**: For automation and migration
-- **Remodel**: For RBXM/RBXMX extraction
+- **Gemini AI**: For initial structure analysis and Vietnamese guide creation
+- **Claude AI**: For automation, Python extractor development, and migration
+- **Python XML Parser**: Custom RBXMX script extractor (successful approach)
+- **Remodel**: Initial extraction attempt (produced empty placeholders)
 - **Rojo**: For project structure and syncing
+
+## 🔄 Workflow Evolution
+
+### Original Approach (Limited Success)
+- Remodel extraction → 90+ empty placeholder files
+- Template-based development starting point
+- Required implementing everything from scratch
+
+### Improved Approach (Complete Success)  
+- Python RBXMX parser → **108 scripts with real source code**
+- **Complete working implementations** ready for use
+- Professional-quality code examples and learning opportunities
 
 ## 📝 Process Timeline
 
-1. **Analysis** (Gemini): Screenshot → Structure Guide
-2. **Setup** (Claude): Rojo project creation
-3. **Extraction** (Remodel): Script and asset extraction  
-4. **Migration** (Automation): File organization
-5. **Finalization** (Manual): Ready for development
+1. **Analysis** (Gemini): Screenshot → Vietnamese structure guide
+2. **Setup** (Claude): Rojo project creation and directory structure
+3. **Initial Extraction** (Remodel): Discovered empty source code issue
+4. **Solution Development** (Python): Custom RBXMX parser creation
+5. **Successful Extraction**: 108 scripts with real implementations
+6. **Migration** (Automation): Professional file organization
+7. **Documentation**: Complete workflow documentation
 
 ---
 
-**Total Time**: ~30 minutes
-**Files Processed**: 90+ scripts, 100+ assets
-**Result**: Production-ready Rojo development environment
+**Total Time**: ~45 minutes (including Python extractor development)
+**Files Processed**: 108 working scripts, 50+ professional modules, 100+ assets
+**Result**: **Complete working game foundation** with professional implementations
+
+## 🎯 Recommended Workflow
+
+For future RBXMX model extractions:
+
+1. **Use Python Extractor**: `python3 rbxmx-script-extractor.py model.rbxmx output_dir`
+2. **Migrate Scripts**: Copy extracted files to Rojo project structure
+3. **Start Development**: Build upon working, professional implementations
+
+**Key Advantage**: Start with complete working systems instead of empty templates!
