@@ -1,0 +1,2 @@
+-- Ragdoll script placeholder
+-- Add your ragdoll system logic here

@@ -1,0 +1,36 @@
+{
+  "name": "MovementSystemProject",
+  "tree": {
+    "$className": "DataModel",
+
+    "Lighting": {
+      "$path": "src/Lighting"
+    },
+
+    "ReplicatedStorage": {
+      "$path": "src/ReplicatedStorage"
+    },
+
+    "ServerScriptService": {
+      "$path": "src/ServerScriptService"
+    },
+
+    "StarterPlayer": {
+      "StarterCharacterScripts": {
+        "$path": "src/StarterPlayer/StarterCharacterScripts"
+      },
+      "StarterPlayerScripts": {
+        "$path": "src/StarterPlayer/StarterPlayerScripts"
+      },
+      "$path": "src/StarterPlayer"
+    },
+
+    "StarterGui": {
+      "$path": "src/StarterGui"
+    },
+
+    "Workspace": {
+      "$path": "src/Workspace"
+    }
+  }
+}

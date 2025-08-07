@@ -1,0 +1,2 @@
+-- Wind Controller script placeholder
+-- Add your wind effects logic here

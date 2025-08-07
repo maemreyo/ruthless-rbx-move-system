@@ -1,0 +1,2 @@
+-- Leaderstats script placeholder
+-- Add your leaderstats logic here

@@ -1,0 +1,2 @@
+-- Slide script placeholder
+-- Add your sliding mechanics here

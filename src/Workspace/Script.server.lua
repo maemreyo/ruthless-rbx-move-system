@@ -1,0 +1,2 @@
+-- Workspace Script placeholder
+-- Add your workspace logic here

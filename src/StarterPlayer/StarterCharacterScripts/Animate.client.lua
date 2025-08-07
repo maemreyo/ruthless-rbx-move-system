@@ -1,0 +1,2 @@
+-- Animate script placeholder
+-- Add your character animation logic here

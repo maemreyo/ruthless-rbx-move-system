@@ -1,0 +1,2 @@
+-- Camera Bobble script placeholder
+-- Add your camera bobbing logic here

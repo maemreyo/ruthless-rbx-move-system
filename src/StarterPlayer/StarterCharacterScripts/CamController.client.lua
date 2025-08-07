@@ -1,0 +1,2 @@
+-- Camera Controller script placeholder
+-- Add your camera control logic here

@@ -1,0 +1,2 @@
+-- Ledge Grab script placeholder
+-- Add your ledge grabbing logic here

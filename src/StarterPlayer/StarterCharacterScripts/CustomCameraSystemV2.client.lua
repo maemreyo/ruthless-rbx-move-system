@@ -1,0 +1,2 @@
+-- Custom Camera System V2 placeholder
+-- Add your custom camera system logic here
