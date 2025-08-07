@@ -165,28 +165,44 @@ local function extractScripts(instance, currentPath)
             end
             
         elseif child.ClassName == "Script" or child.ClassName == "LocalScript" then
-            -- Rule 6: Single Script/LocalScript -> convert to script.lua
-            print("  Processing " .. child.ClassName .. ": " .. child.Name)
-            local scriptExt = getScriptExtension(child.ClassName)
-            local scriptPath = childPath .. scriptExt
-            ensureDir(currentPath)
-            
-            local hasSource, source = pcall(function() return child.Source end)
-            if hasSource and source and source ~= "" then
-                print("    Extracting script: " .. scriptPath)
-                fs.writeFile(scriptPath, source)
-            else
-                print("    Warning: No source for script: " .. child.Name)
-                fs.writeFile(scriptPath, "-- No source found for script: " .. child.Name)
-            end
-            
-            -- Also process any children (rare but possible)
             if #child:GetChildren() > 0 then
+                -- Rule 6a: Script/LocalScript with nested children -> use barrier pattern
+                print("  Processing " .. child.ClassName .. " with children (barrier pattern): " .. child.Name)
+                ensureDir(childPath)
+                
+                -- Create init script for the main script
+                local scriptExt = getScriptExtension(child.ClassName)
+                local initPath = childPath .. "/init" .. scriptExt
+                local hasSource, source = pcall(function() return child.Source end)
+                if hasSource and source and source ~= "" then
+                    print("    Creating init" .. scriptExt .. ": " .. initPath)
+                    fs.writeFile(initPath, source)
+                else
+                    print("    Warning: No source for " .. child.ClassName .. ": " .. child.Name)
+                    fs.writeFile(initPath, "-- No source found for " .. child.ClassName .. ": " .. child.Name)
+                end
+                
+                -- Process children
                 extractScripts(child, childPath)
+            else
+                -- Rule 6b: Single Script/LocalScript -> convert to script.lua
+                print("  Processing single " .. child.ClassName .. ": " .. child.Name)
+                local scriptExt = getScriptExtension(child.ClassName)
+                local scriptPath = childPath .. scriptExt
+                ensureDir(currentPath)
+                
+                local hasSource, source = pcall(function() return child.Source end)
+                if hasSource and source and source ~= "" then
+                    print("    Extracting script: " .. scriptPath)
+                    fs.writeFile(scriptPath, source)
+                else
+                    print("    Warning: No source for script: " .. child.Name)
+                    fs.writeFile(scriptPath, "-- No source found for script: " .. child.Name)
+                end
             end
             
         elseif shouldSaveAsRbxmx(child.ClassName) then
-            -- Rule 5: Specific classes -> convert to rbxmx file
+            -- Rule 5: Specific classes -> convert to rbxmx file (contains all children)
             print("  Processing " .. child.ClassName .. " as rbxmx: " .. child.Name)
             ensureDir(currentPath)
             local modelPath = childPath .. ".rbxmx"
@@ -194,10 +210,7 @@ local function extractScripts(instance, currentPath)
             local serializedModel = roblox.serializeModel({child}, true) -- true = XML format
             fs.writeFile(modelPath, serializedModel)
             
-            -- Also recurse into children if they exist
-            if #child:GetChildren() > 0 then
-                extractScripts(child, childPath)
-            end
+            -- Do NOT recurse - rbxmx file already contains all children
             
         else
             -- Default case: save as rbxmx and recurse

@@ -1,0 +1,67 @@
+   ▶ Attachments must be parented to a BasePart or another Attachment. (x19)  -  Studio
+  Touched is not a valid member of Folder "Workspace.Spawn.RotatingPart.Spikes"  -  Server - Script:3
+  Stack Begin  -  Studio
+  Script 'Workspace.Spawn.RotatingPart.Spikes.Script', Line 3  -  Studio - Script:3
+  Stack End  -  Studio
+  CFrame is not a valid member of Folder "Workspace.Spawn.RotatingPart.center"  -  Server - TweenRotation:9
+  Stack Begin  -  Studio
+  Script 'Workspace.Spawn.RotatingPart.center.TweenRotation', Line 9  -  Studio - TweenRotation:9
+  Stack End  -  Studio
+  StarterCharacter model must have PrimaryPart set  -  Studio
+   ▶ Attachments must be parented to a BasePart or another Attachment. (x19)  -  Studio
+    Text is not a valid member of Folder "Players.ruthlesscodedev.PlayerGui.Map_Select.TextLabel"  -  Server - Script:3
+  Stack Begin  -  Studio
+  Script 'Players.ruthlesscodedev.PlayerGui.Map_Select.TextLabel.Script', Line 3  -  Studio - Script:3
+  Stack End  -  Studio
+  Infinite yield possible on 'Workspace.ruthlesscodedev:WaitForChild("Torso")'  -  Studio
+  Stack Begin  -  Studio
+  Script 'Workspace.ruthlesscodedev.Animate', Line 4  -  Studio - Animate:4
+  Stack End  -  Studio
+  Infinite yield possible on 'Workspace.ruthlesscodedev.LedgeGrab:WaitForChild("ClimbAnim")'  -  Studio
+  Stack Begin  -  Studio
+  Script 'Workspace.ruthlesscodedev.LedgeGrab', Line 6  -  Studio - LedgeGrab:6
+  Stack End  -  Studio
+  Infinite yield possible on 'Workspace.ruthlesscodedev.Slide:WaitForChild("SlideAnimation")'  -  Studio
+  Stack Begin  -  Studio
+  Script 'Workspace.ruthlesscodedev.Slide', Line 4  -  Studio - Slide:4
+  Stack End  -  Studio
+  Touched is not a valid member of Folder "Workspace.Level_-_Easy.Part"  -  Server - KillPartScript:3
+  Stack Begin  -  Studio
+  Script 'Workspace.Level_-_Easy.Part.KillPartScript', Line 3  -  Studio - KillPartScript:3
+  Stack End  -  Studio
+  Touched is not a valid member of Folder "Workspace.Level_-_Easy.Part"  -  Server - Script:2
+  Stack Begin  -  Studio
+  Script 'Workspace.Level_-_Easy.Part.Script', Line 2  -  Studio - Script:2
+  Stack End  -  Studio
+  HumanoidRootPart is not a valid member of Model "Workspace.Ingame.ruthlesscodedev"  -  Server - Ragdoll:20
+  Stack Begin  -  Studio
+  Script 'Workspace.Movement System By LettuceDev.Put in ServerScript Servis.Ragdoll', Line 20  -  Studio - Ragdoll:20
+  Stack End  -  Studio
+  HumanoidRootPart is not a valid member of Model "Workspace.Ingame.ruthlesscodedev"  -  Server - Ragdoll:20
+  Stack Begin  -  Studio
+  Script 'ServerScriptService.Ragdoll', Line 20  -  Studio - Ragdoll:20
+  Stack End  -  Studio
+  StarterCharacter model must have PrimaryPart set  -  Studio
+  Text is not a valid member of Folder "Players.ruthlesscodedev.PlayerGui.Map_Select.TextLabel"  -  Server - Script:3
+  Stack Begin  -  Studio
+  Script 'Players.ruthlesscodedev.PlayerGui.Map_Select.TextLabel.Script', Line 3  -  Studio - Script:3
+  Debris is not a valid member of Workspace "Workspace"  -  Client - Mouse2:100
+  Stack End  -  Studio
+  Stack Begin  -  Studio
+  Script 'ReplicatedStorage.Modules.Mouse2', Line 100 - function GetHit  -  Studio - Mouse2:100
+  Script 'Workspace.Ingame.ruthlesscodedev.CustomCameraSystemV2', Line 142  -  Studio - CustomCameraSystemV2:142
+  Stack End  -  Studio
+   ▶ StarterCharacter model must have PrimaryPart set (x2)  -  Studio
+  Infinite yield possible on 'Workspace.ruthlesscodedev:WaitForChild("Torso")'  -  Studio
+  Infinite yield possible on 'Workspace.ruthlesscodedev.Slide:WaitForChild("SlideAnimation")'  -  Studio
+  Infinite yield possible on 'Workspace.ruthlesscodedev.LedgeGrab:WaitForChild("ClimbAnim")'  -  Studio
+  Disconnect from 127.0.0.1|51667  -  Studio
+  Text is not a valid member of Folder "Players.ruthlesscodedev.PlayerGui.Map_Select.TextLabel"  -  Server
+  Stack Begin  -  Studio
+  Script 'Players.ruthlesscodedev.PlayerGui.Map_Select.TextLabel.Script', Line 3  -  Studio
+  Stack End  -  Studio
+    Debris is not a valid member of Workspace "Workspace"  -  Client - Mouse2:100
+  Stack Begin  -  Studio
+  Script 'ReplicatedStorage.Modules.Mouse2', Line 100 - function GetHit  -  Studio - Mouse2:100
+  Script 'Workspace.Ingame.ruthlesscodedev.CustomCameraSystemV2', Line 142  -  Studio - CustomCameraSystemV2:142
+  Stack End  -  Studio
