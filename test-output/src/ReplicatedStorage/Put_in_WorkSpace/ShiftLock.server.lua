@@ -1,1 +1,0 @@
-game.StarterPlayer.EnableMouseLockOption = false

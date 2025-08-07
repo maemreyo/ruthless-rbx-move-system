@@ -1,0 +1,83 @@
+<roblox version="4">
+  <Item class="Pose" referent="0">
+    <Properties>
+      <string name="Name">Torso</string>
+      <BinaryString name="AttributesSerialize"></BinaryString>
+      <CoordinateFrame name="CFrame">
+        <X>0</X>
+        <Y>0</Y>
+        <Z>0</Z>
+        <R00>1</R00>
+        <R01>0</R01>
+        <R02>0</R02>
+        <R10>0</R10>
+        <R11>1</R11>
+        <R12>0</R12>
+        <R20>0</R20>
+        <R21>0</R21>
+        <R22>1</R22>
+      </CoordinateFrame>
+      <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+      <token name="EasingDirection">0</token>
+      <token name="EasingStyle">0</token>
+      <bool name="DefinesCapabilities">false</bool>
+      <int64 name="SourceAssetId">-1</int64>
+      <BinaryString name="Tags"></BinaryString>
+      <float name="Weight">0</float>
+    </Properties>
+    <Item class="Pose" referent="1">
+      <Properties>
+        <string name="Name">Left Arm</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <CoordinateFrame name="CFrame">
+          <X>-0.000015258789</X>
+          <Y>0.84382915</Y>
+          <Z>0</Z>
+          <R00>-0.75470954</R00>
+          <R01>0.65605915</R01>
+          <R02>0.000000015832484</R02>
+          <R10>-0.65565944</R10>
+          <R11>-0.75424975</R11>
+          <R12>-0.034899488</R12>
+          <R20>-0.022896115</R20>
+          <R21>-0.026338987</R21>
+          <R22>0.99939096</R22>
+        </CoordinateFrame>
+        <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+        <token name="EasingDirection">0</token>
+        <token name="EasingStyle">0</token>
+        <bool name="DefinesCapabilities">false</bool>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+        <float name="Weight">1</float>
+      </Properties>
+    </Item>
+    <Item class="Pose" referent="2">
+      <Properties>
+        <string name="Name">Right Arm</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <CoordinateFrame name="CFrame">
+          <X>0.3527069</X>
+          <Y>0.8593149</Y>
+          <Z>0</Z>
+          <R00>-0.79863566</R00>
+          <R01>-0.60181487</R01>
+          <R02>-0.00000008940697</R02>
+          <R10>0.58393836</R10>
+          <R11>-0.7749127</R11>
+          <R12>-0.2419219</R12>
+          <R20>0.14559212</R20>
+          <R21>-0.1932075</R21>
+          <R22>0.97029567</R22>
+        </CoordinateFrame>
+        <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+        <token name="EasingDirection">0</token>
+        <token name="EasingStyle">0</token>
+        <bool name="DefinesCapabilities">false</bool>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+        <float name="Weight">1</float>
+      </Properties>
+    </Item>
+  </Item>
+</roblox>

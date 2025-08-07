@@ -90,6 +90,11 @@ local function ensureDir(path)
     end
 end
 
+-- Helper function to check if an instance is a "Put in" wrapper that should be unwrapped
+local function isPutInWrapper(instance)
+    return instance.Name:match("^Put in (.+)$") ~= nil
+end
+
 -- Recursive function to extract scripts from instances
 local function extractScripts(instance, currentPath)
     local children = instance:GetChildren()
@@ -99,16 +104,24 @@ local function extractScripts(instance, currentPath)
         local childPath = currentPath .. "/" .. childName
         
         if child.ClassName == "Model" then
-            -- Rule 1: Model -> convert all items inside to individual rbxmx files
-            print("  Processing Model: " .. child.Name)
-            ensureDir(currentPath)
-            local modelPath = childPath .. ".rbxmx"
-            print("  Saving model: " .. modelPath)
-            local serializedModel = roblox.serializeModel({child})
-            fs.writeFile(modelPath, serializedModel)
-            
-            -- Also recurse into children to extract any scripts inside
-            extractScripts(child, childPath)
+            -- Check if this is a "Put in" wrapper model
+            if isPutInWrapper(child) then
+                -- Rule: "Put in" wrapper -> extract contents directly, skip the wrapper
+                print("  Processing 'Put in' wrapper Model: " .. child.Name)
+                print("    Unwrapping contents directly to current path")
+                extractScripts(child, currentPath)
+            else
+                -- Rule 1: Normal Model -> convert all items inside to individual rbxmx files
+                print("  Processing Model: " .. child.Name)
+                ensureDir(currentPath)
+                local modelPath = childPath .. ".rbxmx"
+                print("  Saving model: " .. modelPath)
+                local serializedModel = roblox.serializeModel({child}, true) -- true = XML format
+                fs.writeFile(modelPath, serializedModel)
+                
+                -- Also recurse into children to extract any scripts inside
+                extractScripts(child, childPath)
+            end
             
         elseif child.ClassName == "Folder" then
             -- Rule 2: Folder -> find all items inside to process further
@@ -178,7 +191,7 @@ local function extractScripts(instance, currentPath)
             ensureDir(currentPath)
             local modelPath = childPath .. ".rbxmx"
             print("    Saving as rbxmx: " .. modelPath)
-            local serializedModel = roblox.serializeModel({child})
+            local serializedModel = roblox.serializeModel({child}, true) -- true = XML format
             fs.writeFile(modelPath, serializedModel)
             
             -- Also recurse into children if they exist
@@ -193,7 +206,7 @@ local function extractScripts(instance, currentPath)
                 ensureDir(currentPath)
                 local modelPath = childPath .. ".rbxmx"
                 print("    Saving unknown class as rbxmx: " .. modelPath)
-                local serializedModel = roblox.serializeModel({child})
+                local serializedModel = roblox.serializeModel({child}, true) -- true = XML format
                 fs.writeFile(modelPath, serializedModel)
                 extractScripts(child, childPath)
             end
@@ -222,12 +235,40 @@ local function setupRojoStructure()
     end
 end
 
--- Map instances to appropriate Rojo directories
+-- Map instances to appropriate Rojo directories based on "Put in" pattern
 local function mapInstanceToRojoPath(instance)
     local className = instance.ClassName
     local name = instance.Name
     
-    -- Map based on common Roblox service patterns
+    -- Check for "Put in" pattern first
+    local putInPattern = name:match("^Put in (.+)$")
+    if putInPattern then
+        local serviceName = putInPattern:gsub("_", ""):gsub(" ", "")
+        
+        -- Map based on "Put in" pattern
+        if serviceName:lower():find("lighting") then
+            return "src/Lighting"
+        elseif serviceName:lower():find("replicatedstorage") or serviceName:lower():find("replicated") then
+            return "src/ReplicatedStorage"
+        elseif serviceName:lower():find("serverscriptservice") or serviceName:lower():find("serverscript") then
+            return "src/ServerScriptService"
+        elseif serviceName:lower():find("starterplayerscripts") then
+            return "src/StarterPlayer/StarterPlayerScripts"
+        elseif serviceName:lower():find("startercharacterscripts") or serviceName:lower():find("startercharacter") then
+            return "src/StarterPlayer/StarterCharacterScripts"
+        elseif serviceName:lower():find("starterplayer") then
+            return "src/StarterPlayer"
+        elseif serviceName:lower():find("startergui") then
+            return "src/StarterGui"
+        elseif serviceName:lower():find("workspace") then
+            return "src/Workspace"
+        else
+            -- Default to ReplicatedStorage for unknown "Put in" patterns
+            return "src/ReplicatedStorage"
+        end
+    end
+    
+    -- Fallback to original mapping for non-"Put in" instances
     if name == "Lighting" or className == "Lighting" then
         return "src/Lighting"
     elseif name == "ReplicatedStorage" or className == "ReplicatedStorage" then
@@ -254,14 +295,58 @@ end
 print("Setting up Rojo directory structure...")
 setupRojoStructure()
 
+-- Helper function to process instances and handle "Put in" wrappers
+local function processInstance(instance, basePath)
+    local children = instance:GetChildren()
+    
+    for _, child in ipairs(children) do
+        if isPutInWrapper(child) then
+            -- This is a "Put in" wrapper - map it to the correct service directory
+            local childBasePath = outputDir .. "/" .. mapInstanceToRojoPath(child)
+            print("  Found 'Put in' wrapper: " .. child.Name)
+            print("    Mapping to: " .. childBasePath)
+            -- Extract children directly to the mapped path, skipping the wrapper
+            extractScripts(child, childBasePath)
+        else
+            -- Process normally
+            local childName = sanitizeFileName(child.Name)
+            local childPath = basePath .. "/" .. childName
+            
+            if child.ClassName == "Model" then
+                print("  Processing Model: " .. child.Name)
+                ensureDir(basePath)
+                local modelPath = childPath .. ".rbxmx"
+                print("  Saving model: " .. modelPath)
+                local serializedModel = roblox.serializeModel({child}, true) -- true = XML format
+                fs.writeFile(modelPath, serializedModel)
+                
+                -- Also recurse into children to extract any scripts inside
+                extractScripts(child, childPath)
+            else
+                -- For other types, process them individually using the existing logic
+                local tempInstance = {GetChildren = function() return {child} end}
+                extractScripts(tempInstance, basePath)
+            end
+        end
+    end
+end
+
 -- Extract from all top-level instances
 for i, instance in ipairs(instances) do
-    local basePath = outputDir .. "/" .. mapInstanceToRojoPath(instance)
     print("Processing instance " .. i .. ": " .. instance.Name .. " (" .. instance.ClassName .. ")")
-    print("  Mapping to: " .. basePath)
     
-    -- Extract this instance
-    extractScripts(instance, basePath)
+    -- Check if this is a "Put in" wrapper that should be unwrapped
+    if isPutInWrapper(instance) then
+        local basePath = outputDir .. "/" .. mapInstanceToRojoPath(instance)
+        print("  Detected top-level 'Put in' wrapper - extracting contents directly to: " .. basePath)
+        -- Extract children directly to the mapped path, skipping the wrapper
+        extractScripts(instance, basePath)
+    else
+        -- For non-wrapper instances, check if they contain "Put in" wrappers
+        local basePath = outputDir .. "/" .. mapInstanceToRojoPath(instance)
+        print("  Mapping to: " .. basePath)
+        processInstance(instance, basePath)
+    end
 end
 
 print("\n✅ Extraction complete!")
