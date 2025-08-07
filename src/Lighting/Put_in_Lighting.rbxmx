@@ -1,0 +1,188 @@
+<roblox version="4">
+  <Item class="Model" referent="0">
+    <Properties>
+      <string name="Name">Put in Lighting</string>
+      <BinaryString name="AttributesSerialize"></BinaryString>
+      <bool name="DefinesCapabilities">false</bool>
+      <token name="LevelOfDetail">0</token>
+      <CoordinateFrame name="ModelMeshCFrame">
+        <X>0</X>
+        <Y>0</Y>
+        <Z>0</Z>
+        <R00>1</R00>
+        <R01>0</R01>
+        <R02>0</R02>
+        <R10>0</R10>
+        <R11>1</R11>
+        <R12>0</R12>
+        <R20>0</R20>
+        <R21>0</R21>
+        <R22>1</R22>
+      </CoordinateFrame>
+      <SharedString name="ModelMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
+      <Vector3 name="ModelMeshSize">
+        <X>0</X>
+        <Y>0</Y>
+        <Z>0</Z>
+      </Vector3>
+      <token name="ModelStreamingMode">0</token>
+      <bool name="NeedsPivotMigration">false</bool>
+      <Ref name="PrimaryPart">null</Ref>
+      <float name="ScaleFactor">1</float>
+      <int64 name="SourceAssetId">-1</int64>
+      <BinaryString name="Tags"></BinaryString>
+      <OptionalCoordinateFrame name="WorldPivotData">
+        <CFrame>
+          <X>-13431.163</X>
+          <Y>7079.448</Y>
+          <Z>-8613.895</Z>
+          <R00>1</R00>
+          <R01>0</R01>
+          <R02>0</R02>
+          <R10>0</R10>
+          <R11>1</R11>
+          <R12>0</R12>
+          <R20>0</R20>
+          <R21>0</R21>
+          <R22>1</R22>
+        </CFrame>
+      </OptionalCoordinateFrame>
+    </Properties>
+    <Item class="BloomEffect" referent="1">
+      <Properties>
+        <string name="Name">Bloom</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <bool name="DefinesCapabilities">false</bool>
+        <bool name="Enabled">true</bool>
+        <float name="Intensity">0.35</float>
+        <float name="Size">56</float>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+        <float name="Threshold">1.4</float>
+      </Properties>
+    </Item>
+    <Item class="ColorCorrectionEffect" referent="2">
+      <Properties>
+        <string name="Name">ColorCorrection</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <float name="Brightness">-0.05</float>
+        <float name="Contrast">0.5</float>
+        <bool name="DefinesCapabilities">false</bool>
+        <bool name="Enabled">true</bool>
+        <float name="Saturation">0.2</float>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+        <Color3 name="TintColor">
+          <R>1</R>
+          <G>0.9176471</G>
+          <B>0.9176471</B>
+        </Color3>
+      </Properties>
+    </Item>
+    <Item class="DepthOfFieldEffect" referent="3">
+      <Properties>
+        <string name="Name">DepthOfField</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <bool name="DefinesCapabilities">false</bool>
+        <bool name="Enabled">true</bool>
+        <float name="FarIntensity">0.236</float>
+        <float name="FocusDistance">32.76</float>
+        <float name="InFocusRadius">35.2</float>
+        <float name="NearIntensity">1</float>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+      </Properties>
+    </Item>
+    <Item class="BlurEffect" referent="4">
+      <Properties>
+        <string name="Name">GUIBlur</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <bool name="DefinesCapabilities">false</bool>
+        <bool name="Enabled">true</bool>
+        <float name="Size">0</float>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+      </Properties>
+    </Item>
+    <Item class="SunRaysEffect" referent="5">
+      <Properties>
+        <string name="Name">SunRays</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <bool name="DefinesCapabilities">false</bool>
+        <bool name="Enabled">true</bool>
+        <float name="Intensity">0.2</float>
+        <int64 name="SourceAssetId">-1</int64>
+        <float name="Spread">1</float>
+        <BinaryString name="Tags"></BinaryString>
+      </Properties>
+    </Item>
+    <Item class="Sky" referent="6">
+      <Properties>
+        <string name="Name">Sky</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <bool name="CelestialBodiesShown">true</bool>
+        <bool name="DefinesCapabilities">false</bool>
+        <float name="MoonAngularSize">10</float>
+        <Content name="MoonTextureId">
+          <url>rbxasset://sky/moon.jpg</url>
+        </Content>
+        <Content name="SkyboxBk">
+          <url>http://www.roblox.com/asset/?id=91458024</url>
+        </Content>
+        <Content name="SkyboxDn">
+          <url>http://www.roblox.com/asset/?id=91457980</url>
+        </Content>
+        <Content name="SkyboxFt">
+          <url>http://www.roblox.com/asset/?id=91458024</url>
+        </Content>
+        <Content name="SkyboxLf">
+          <url>http://www.roblox.com/asset/?id=91458024</url>
+        </Content>
+        <Vector3 name="SkyboxOrientation">
+          <X>0</X>
+          <Y>0</Y>
+          <Z>0</Z>
+        </Vector3>
+        <Content name="SkyboxRt">
+          <url>http://www.roblox.com/asset/?id=91458024</url>
+        </Content>
+        <Content name="SkyboxUp">
+          <url>http://www.roblox.com/asset/?id=91458002</url>
+        </Content>
+        <int64 name="SourceAssetId">-1</int64>
+        <int name="StarCount">5000</int>
+        <float name="SunAngularSize">25</float>
+        <Content name="SunTextureId">
+          <url>rbxasset://sky/sun.jpg</url>
+        </Content>
+        <BinaryString name="Tags"></BinaryString>
+      </Properties>
+    </Item>
+    <Item class="Atmosphere" referent="7">
+      <Properties>
+        <string name="Name">Atmosphere</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <Color3 name="Color">
+          <R>0.8627451</R>
+          <G>0.8627451</G>
+          <B>0.8627451</B>
+        </Color3>
+        <Color3 name="Decay">
+          <R>0.9019608</R>
+          <G>0.9372549</G>
+          <B>1</B>
+        </Color3>
+        <bool name="DefinesCapabilities">false</bool>
+        <float name="Density">0.4</float>
+        <float name="Glare">0.3</float>
+        <float name="Haze">1.4</float>
+        <float name="Offset">0</float>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+      </Properties>
+    </Item>
+  </Item>
+  <SharedStrings>
+    <SharedString md5="rxNJufX5oaagQE3qNtzJSQ=="></SharedString>
+  </SharedStrings>
+</roblox>

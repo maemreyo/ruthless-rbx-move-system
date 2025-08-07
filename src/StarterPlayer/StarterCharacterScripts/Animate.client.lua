@@ -1,2 +1,1 @@
--- Animate script placeholder
--- Add your character animation logic here
+-- No source found for script: Animate

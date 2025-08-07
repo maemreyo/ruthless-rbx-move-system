@@ -1,2 +1,1 @@
--- Camera Bobble script placeholder
--- Add your camera bobbing logic here
+-- No source found for script: CameraBobble

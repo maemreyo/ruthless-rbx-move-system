@@ -1,0 +1,42 @@
+<roblox version="4">
+  <Item class="Sound" referent="0">
+    <Properties>
+      <string name="Name">Break</string>
+      <BinaryString name="AttributesSerialize"></BinaryString>
+      <bool name="DefinesCapabilities">false</bool>
+      <bool name="IsMutedForCapture">false</bool>
+      <NumberRange name="LoopRegion">0 60000 </NumberRange>
+      <bool name="Looped">false</bool>
+      <bool name="PlayOnRemove">false</bool>
+      <NumberRange name="PlaybackRegion">0 60000 </NumberRange>
+      <bool name="PlaybackRegionsEnabled">false</bool>
+      <float name="PlaybackSpeed">3</float>
+      <bool name="Playing">false</bool>
+      <float name="RollOffMaxDistance">200</float>
+      <float name="RollOffMinDistance">10</float>
+      <token name="RollOffMode">0</token>
+      <Ref name="SoundGroup">null</Ref>
+      <Content name="SoundId">
+        <url>rbxassetid://3744391247</url>
+      </Content>
+      <int64 name="SourceAssetId">-1</int64>
+      <BinaryString name="Tags"></BinaryString>
+      <double name="TimePosition">0</double>
+      <float name="Volume">0.25</float>
+    </Properties>
+    <Item class="EqualizerSoundEffect" referent="1">
+      <Properties>
+        <string name="Name">EqualizerSoundEffect</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <bool name="DefinesCapabilities">false</bool>
+        <bool name="Enabled">true</bool>
+        <float name="HighGain">0</float>
+        <float name="LowGain">-15</float>
+        <float name="MidGain">-5</float>
+        <int name="Priority">0</int>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+      </Properties>
+    </Item>
+  </Item>
+</roblox>

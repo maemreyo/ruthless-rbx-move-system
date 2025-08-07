@@ -1,2 +1,1 @@
--- Custom Camera System V2 placeholder
--- Add your custom camera system logic here
+-- No source found for script: CustomCameraSystemV2
