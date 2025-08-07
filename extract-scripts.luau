@@ -1,9 +1,13 @@
--- Remodel script to extract scripts and assets from RBXM/RBXMX files into Rojo project structure
--- Usage: ./remodel extract-scripts.lua <input-file.rbxm/rbxmx> [output-dir]
+-- Lune script to extract scripts and assets from RBXM/RBXMX files into Rojo project structure
+-- Usage: lune run extract-scripts <input-file.rbxm/rbxmx> [output-dir]
 
-local args = {...}
+local fs = require("@lune/fs")
+local roblox = require("@lune/roblox")
+local process = require("@lune/process")
+
+local args = process.args
 if #args < 1 then
-    print("Usage: remodel extract-scripts.lua <input-file.rbxm/rbxmx> [output-dir]")
+    print("Usage: lune run extract-scripts <input-file.rbxm/rbxmx> [output-dir]")
     return
 end
 
@@ -13,7 +17,8 @@ local outputDir = args[2] or "extracted"
 print("Loading model file: " .. inputFile)
 
 -- Read the model file
-local instances = remodel.readModelFile(inputFile)
+local fileContents = fs.readFile(inputFile)
+local instances = roblox.deserializeModel(fileContents)
 
 if #instances == 0 then
     print("No instances found in the model file!")
@@ -80,7 +85,9 @@ end
 
 -- Helper function to create directory path
 local function ensureDir(path)
-    remodel.createDirAll(path)
+    if not fs.isDir(path) then
+        fs.writeDir(path)
+    end
 end
 
 -- Recursive function to extract scripts from instances
@@ -97,7 +104,8 @@ local function extractScripts(instance, currentPath)
             ensureDir(currentPath)
             local modelPath = childPath .. ".rbxmx"
             print("  Saving model: " .. modelPath)
-            remodel.writeModelFile(modelPath, child)
+            local serializedModel = roblox.serializeModel({child})
+            fs.writeFile(modelPath, serializedModel)
             
             -- Also recurse into children to extract any scripts inside
             extractScripts(child, childPath)
@@ -119,10 +127,10 @@ local function extractScripts(instance, currentPath)
                 local hasSource, source = pcall(function() return child.Source end)
                 if hasSource and source and source ~= "" then
                     print("    Creating init.lua: " .. initPath)
-                    remodel.writeFile(initPath, source)
+                    fs.writeFile(initPath, source)
                 else
                     print("    Warning: No source for ModuleScript: " .. child.Name)
-                    remodel.writeFile(initPath, "-- No source found for ModuleScript: " .. child.Name)
+                    fs.writeFile(initPath, "-- No source found for ModuleScript: " .. child.Name)
                 end
                 
                 -- Process children
@@ -136,10 +144,10 @@ local function extractScripts(instance, currentPath)
                 local hasSource, source = pcall(function() return child.Source end)
                 if hasSource and source and source ~= "" then
                     print("    Extracting ModuleScript: " .. scriptPath)
-                    remodel.writeFile(scriptPath, source)
+                    fs.writeFile(scriptPath, source)
                 else
                     print("    Warning: No source for ModuleScript: " .. child.Name)
-                    remodel.writeFile(scriptPath, "-- No source found for ModuleScript: " .. child.Name)
+                    fs.writeFile(scriptPath, "-- No source found for ModuleScript: " .. child.Name)
                 end
             end
             
@@ -153,10 +161,10 @@ local function extractScripts(instance, currentPath)
             local hasSource, source = pcall(function() return child.Source end)
             if hasSource and source and source ~= "" then
                 print("    Extracting script: " .. scriptPath)
-                remodel.writeFile(scriptPath, source)
+                fs.writeFile(scriptPath, source)
             else
                 print("    Warning: No source for script: " .. child.Name)
-                remodel.writeFile(scriptPath, "-- No source found for script: " .. child.Name)
+                fs.writeFile(scriptPath, "-- No source found for script: " .. child.Name)
             end
             
             -- Also process any children (rare but possible)
@@ -170,7 +178,8 @@ local function extractScripts(instance, currentPath)
             ensureDir(currentPath)
             local modelPath = childPath .. ".rbxmx"
             print("    Saving as rbxmx: " .. modelPath)
-            remodel.writeModelFile(modelPath, child)
+            local serializedModel = roblox.serializeModel({child})
+            fs.writeFile(modelPath, serializedModel)
             
             -- Also recurse into children if they exist
             if #child:GetChildren() > 0 then
@@ -184,7 +193,8 @@ local function extractScripts(instance, currentPath)
                 ensureDir(currentPath)
                 local modelPath = childPath .. ".rbxmx"
                 print("    Saving unknown class as rbxmx: " .. modelPath)
-                remodel.writeModelFile(modelPath, child)
+                local serializedModel = roblox.serializeModel({child})
+                fs.writeFile(modelPath, serializedModel)
                 extractScripts(child, childPath)
             end
         end
