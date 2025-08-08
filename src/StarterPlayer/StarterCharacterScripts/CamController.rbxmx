@@ -1,0 +1,46 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="LocalScript" referent="RBX0004e0d9c4f8436489aa60a109cfa619">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+			<bool name="DefinesCapabilities">false</bool>
+			<bool name="Disabled">false</bool>
+			<Content name="LinkedSource"><null></null></Content>
+			<string name="Name">CamController</string>
+			<token name="RunContext">0</token>
+			<string name="ScriptGuid">{7BD35B23-44E5-44AA-AE12-827E0BB61197}</string>
+			<ProtectedString name="Source"><![CDATA[task.wait()
+
+local RS = game:GetService("ReplicatedStorage")
+
+local Modules = RS.Modules
+
+local plr = game.Players.LocalPlayer
+local char = plr.Character
+local humanoid = char.Humanoid
+local healthhumanoid = humanoid.Health
+
+local camera = workspace.CurrentCamera
+
+local CameraShaker = require(Modules.CameraShaker)
+
+local camShake = CameraShaker.new(Enum.RenderPriority.Camera.Value, function(shakeCFrame)
+	camera.CFrame = camera.CFrame * shakeCFrame
+end)
+
+camShake:Start()
+
+humanoid.HealthChanged:Connect(function(health)
+	if healthhumanoid > health then
+		camShake:Shake(CameraShaker.Presets.Bump)
+	end
+	healthhumanoid = health
+end)]]></ProtectedString>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+	</Item>
+</roblox>

@@ -1,0 +1,122 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="LocalScript" referent="RBX67b9c8efa0eb4b3eb1c42497dae9f7c2">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+			<bool name="DefinesCapabilities">false</bool>
+			<bool name="Disabled">false</bool>
+			<Content name="LinkedSource"><null></null></Content>
+			<string name="Name">Slide</string>
+			<token name="RunContext">0</token>
+			<string name="ScriptGuid">{7C404A5F-B5F5-494E-84DD-9E63F2054CC2}</string>
+			<ProtectedString name="Source"><![CDATA[local UIS = game:GetService("UserInputService")
+local char = script.Parent
+
+local slideAnim = script:WaitForChild("SlideAnimation")
+
+
+local keybind2 = Enum.KeyCode.E --key code
+local canslide = true
+
+UIS.InputBegan:Connect(function(input,gameprocessed)
+	if gameprocessed then return end
+	if not canslide then return end
+
+	if input.KeyCode == keybind2 then
+		canslide = false
+local party	= script:WaitForChild("ParticleEmitter"):Clone()
+		local playAnim = char.Humanoid:LoadAnimation(slideAnim)
+		playAnim:Play()
+	
+		party.Parent = char:WaitForChild("Torso") -- if you have r15 change to UpperTorso	
+		party.Enabled = true
+	
+
+		local slide = Instance.new("BodyVelocity")
+		slide.MaxForce = Vector3.new(1,0,1)*50000
+		slide.Velocity = char.HumanoidRootPart.CFrame.lookVector*100
+		slide.Parent = char.HumanoidRootPart
+
+		for count = 1,8 do
+			wait(0.1)
+			slide.Velocity*=0.8
+		end
+		
+		party.Enabled = false
+		playAnim:Stop()
+		slide:Destroy()
+
+		wait(2)
+		party:Destroy()
+		canslide = true
+	end
+end)]]></ProtectedString>
+			<int64 name="SourceAssetId">8672691988</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="Animation" referent="RBXb22532a375e146d7a8bc09aa2deffa0b">
+			<Properties>
+				<Content name="AnimationId"><url>rbxassetid://13567484737</url></Content>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<string name="Name">SlideAnimation</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="ParticleEmitter" referent="RBX680d9bb5de354da6bb5673adcbeafe6b">
+			<Properties>
+				<Vector3 name="Acceleration">
+					<X>0</X>
+					<Y>0.100000001</Y>
+					<Z>0</Z>
+				</Vector3>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="Brightness">1</float>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<ColorSequence name="Color">0 1 1 1 0 1 0.427451 0.427451 0.427451 0 </ColorSequence>
+				<bool name="DefinesCapabilities">false</bool>
+				<float name="Drag">0</float>
+				<token name="EmissionDirection">1</token>
+				<bool name="Enabled">false</bool>
+				<NumberRange name="FlipbookFramerate">1 1 </NumberRange>
+				<string name="FlipbookIncompatible">Particle texture must be 1024 by 1024 to use flipbooks.</string>
+				<token name="FlipbookLayout">0</token>
+				<token name="FlipbookMode">0</token>
+				<bool name="FlipbookStartRandom">false</bool>
+				<NumberRange name="Lifetime">2 3 </NumberRange>
+				<float name="LightEmission">0</float>
+				<float name="LightInfluence">1</float>
+				<bool name="LockedToPart">false</bool>
+				<string name="Name">ParticleEmitter</string>
+				<token name="Orientation">0</token>
+				<float name="Rate">20</float>
+				<NumberRange name="RotSpeed">10 13 </NumberRange>
+				<NumberRange name="Rotation">0 300 </NumberRange>
+				<token name="Shape">0</token>
+				<token name="ShapeInOut">0</token>
+				<float name="ShapePartial">1</float>
+				<token name="ShapeStyle">0</token>
+				<NumberSequence name="Size">0 1 0 0.597015 4.75 0 1 10 0 </NumberSequence>
+				<int64 name="SourceAssetId">-1</int64>
+				<NumberRange name="Speed">5 5 </NumberRange>
+				<Vector2 name="SpreadAngle">
+					<X>1</X>
+					<Y>1</Y>
+				</Vector2>
+				<NumberSequence name="Squash">0 0 0 1 0 0 </NumberSequence>
+				<BinaryString name="Tags"></BinaryString>
+				<Content name="Texture"><url>rbxassetid://7731347137</url></Content>
+				<float name="TimeScale">1</float>
+				<NumberSequence name="Transparency">0 0.58125 0 0.27899 0.925 0 1 1 0 </NumberSequence>
+				<float name="VelocityInheritance">0.5</float>
+				<bool name="WindAffectsDrag">false</bool>
+				<float name="ZOffset">0</float>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>
