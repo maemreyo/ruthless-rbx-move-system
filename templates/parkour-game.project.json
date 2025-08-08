@@ -1,0 +1,66 @@
+{
+  "name": "ParkourGameTemplate",
+  "tree": {
+    "$className": "DataModel",
+
+    "Lighting": {
+      "$path": "src/Lighting"
+    },
+
+    "ReplicatedStorage": {
+      "Modules": {
+        "$path": "src/ReplicatedStorage/Modules",
+        "$include": [
+          "CameraShaker",
+          "Zone", 
+          "BezierTweens",
+          "Janitor",
+          "Signal",
+          "PartCache",
+          "LightningBolt"
+        ]
+      },
+      "Maps": {
+        "$path": "src/ReplicatedStorage/Maps"
+      }
+    },
+
+    "ServerScriptService": {
+      "$path": "src/ServerScriptService",
+      "$include": [
+        "leaderstats.server.lua"
+      ]
+    },
+
+    "StarterPlayer": {
+      "StarterCharacterScripts": {
+        "$path": "src/StarterPlayer/StarterCharacterScripts",
+        "$include": [
+          "Slide",
+          "LedgeGrab", 
+          "CameraBobble.client.lua",
+          "FOVLock.client.lua",
+          "CamController.client.lua"
+        ]
+      },
+      "StarterCharacter": {
+        "$path": "src/StarterPlayer/StarterCharacter"
+      },
+      "StarterPlayerScripts": {
+        "$path": "src/StarterPlayer/StarterPlayerScripts",
+        "$include": [
+          "WindController",
+          "LocalScript"
+        ]
+      }
+    },
+
+    "StarterGui": {
+      "$path": "src/StarterGui"
+    },
+
+    "Workspace": {
+      "$path": "src/Workspace"
+    }
+  }
+}
